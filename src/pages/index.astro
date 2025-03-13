@@ -134,7 +134,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
   <body>
     <Header />
     <main>
-      <h2 class='title'>Snap Images from YouTube Videos</h2>
+      <h1 class='title'>Snap Images from YouTube Videos</h1>
       <p class='subtitle'>
         Capture multiple shots from any YouTube video in seconds <br />easy and
         hassle-free.
@@ -158,18 +158,33 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
             ></path>
           </svg>
         </div>
-        <button id='snap-button'>Snap Now</button>
+        <button id='snap-button' disabled>Snap Now</button>
       </div>
 
       <div class='image-container'>
-        <img id='snap1' src='' alt='Snapshot 1' style='display: none;' />
-        <img id='snap2' src='' alt='Snapshot 2' style='display: none;' />
-        <img id='snap3' src='' alt='Snapshot 3' style='display: none;' />
+        <img
+          id='snap1'
+          src=''
+          alt='First snapshot from YouTube video'
+          style='display: none;'
+        />
+        <img
+          id='snap2'
+          src=''
+          alt='Second snapshot from YouTube video'
+          style='display: none;'
+        />
+        <img
+          id='snap3'
+          src=''
+          alt='Third snapshot from YouTube video'
+          style='display: none;'
+        />
       </div>
     </main>
     <Footer />
     <script>
-      const apiUrl = import.meta.env.PUBLIC_API_URL;
+      const apiUrl = import.meta.env.PUBLIC_API_URL
 
       document.addEventListener('DOMContentLoaded', () => {
         const urlInput: HTMLInputElement = document.querySelector(
