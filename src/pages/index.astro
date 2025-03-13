@@ -1,49 +1,251 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import BaseHead from '../components/BaseHead.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
 ---
 
 <!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
+<html lang='en'>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+      .title {
+        color: #000000; /* Đen */
+        font-size: 3rem;
+        font-weight: 600;
+        margin: 0 0 10px 0;
+        text-align: center;
+      }
+
+      .subtitle {
+        color: #666666; /* Xám nhạt */
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin: 0 0 20px 0;
+        text-align: center;
+      }
+
+      .snap-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .input-wrapper {
+        position: relative;
+        width: 600px;
+        max-width: 100%;
+      }
+
+      #url-input {
+        padding: 12px;
+        padding-right: 40px;
+        width: 100%;
+        border: 1px solid #000000;
+        border-radius: 6px;
+        font-size: 1rem;
+        background-color: #ffffff;
+        color: #000000;
+        outline: none;
+        box-sizing: border-box;
+        transition: box-shadow 0.3s ease;
+      }
+
+      #url-input:focus {
+        border-color: #000000;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.4); /* Shadow khi focus */
+      }
+
+      #url-input:hover {
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.3); /* Shadow khi hover */
+      }
+
+      .clear-icon {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        display: none;
+      }
+
+      #snap-button {
+        padding: 12px 25px;
+        background-color: #000000;
+        color: #ffffff;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      #snap-button:hover:not(:disabled) {
+        background-color: #333333;
+      }
+
+      #snap-button:disabled {
+        background-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      .image-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3 cột bằng nhau */
+        gap: 10px;
+        margin-top: 20px;
+        max-width: fit-content;
+      }
+
+      .image-container img {
+        width: 100%;
+        height: auto;
+        border: 1px solid #000000;
+        border-radius: 4px;
+      }
+
+      @media (max-width: 599px) {
+        .title {
+          font-size: 2.2rem;
+        }
+
+        .subtitle {
+          font-size: 0.8rem;
+        }
+
+        #url-input {
+          padding: 10px;
+          font-size: 0.9rem;
+        }
+
+        #snap-button {
+          padding: 10px 20px;
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <h2 class='title'>Snap Images from YouTube Videos</h2>
+      <p class='subtitle'>
+        Capture multiple shots from any YouTube video in seconds <br />easy and
+        hassle-free.
+      </p>
+
+      <div class='snap-form'>
+        <div class='input-wrapper'>
+          <input
+            type='text'
+            id='url-input'
+            placeholder='Paste your YouTube URL here'
+          />
+          <svg
+            class='clear-icon'
+            width='16'
+            height='16'
+            viewBox='0 0 16 16'
+            fill='none'
+          >
+            <path d='M12 4L4 12M4 4L12 12' stroke='#666666' stroke-width='2.5'
+            ></path>
+          </svg>
+        </div>
+        <button id='snap-button'>Snap Now</button>
+      </div>
+
+      <div class='image-container'>
+        <img id='snap1' src='' alt='Snapshot 1' style='display: none;' />
+        <img id='snap2' src='' alt='Snapshot 2' style='display: none;' />
+        <img id='snap3' src='' alt='Snapshot 3' style='display: none;' />
+      </div>
+    </main>
+    <Footer />
+    <script>
+      const apiUrl = import.meta.env.PUBLIC_API_URL;
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const urlInput: HTMLInputElement = document.querySelector(
+          '#url-input'
+        ) as HTMLInputElement
+        const snapButton: HTMLButtonElement = document.querySelector(
+          '#snap-button'
+        ) as HTMLButtonElement
+        const clearIcon: HTMLElement = document.querySelector(
+          '.clear-icon'
+        ) as HTMLElement
+
+        const snap1: HTMLImageElement = document.querySelector(
+          '#snap1'
+        ) as HTMLImageElement
+        const snap2: HTMLImageElement = document.querySelector(
+          '#snap2'
+        ) as HTMLImageElement
+        const snap3: HTMLImageElement = document.querySelector(
+          '#snap3'
+        ) as HTMLImageElement
+
+        function validateUrl(): void {
+          const url: string = urlInput.value.trim()
+          const youtubeRegex: RegExp =
+            /^(https?:\/\/)?((www|m)\.)?(youtube\.com\/(watch\?(.*&)?v=|embed\/|v\/)|youtu\.be\/)[\w-]{11}(&[\w-]+=[\w-]+)*$/
+          const isValidUrl: boolean = youtubeRegex.test(url)
+
+          snapButton.disabled = !isValidUrl
+
+          // Hiện/ẩn icon clear dựa trên value
+          clearIcon.style.display = url.length > 0 ? 'block' : 'none'
+        }
+
+        // Xóa value khi click icon
+        clearIcon.addEventListener('click', () => {
+          urlInput.value = ''
+          validateUrl() // Gọi lại để cập nhật trạng thái nút và ẩn icon
+        })
+
+        snapButton.addEventListener('click', async () => {
+          if (!snapButton.disabled || !apiUrl) {
+            try {
+              // Gọi API phía server
+              const response = await fetch(`${apiUrl}/api/screenshots`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: urlInput.value }),
+              })
+
+              if (!response.ok) {
+                throw new Error(
+                  `API request failed with status: ${response.status}`
+                )
+              }
+
+              const data: { images: string[] } = await response.json()
+
+              // Hiển thị ảnh từ response
+              snap1.src = data.images[0]
+              snap2.src = data.images[1]
+              snap3.src = data.images[2]
+              snap1.style.display = 'block'
+              snap2.style.display = 'block'
+              snap3.style.display = 'block'
+            } catch (error) {
+              console.error('Error fetching snapshots:', error)
+              alert('Failed to fetch snapshots. Please try again.')
+            }
+          }
+        })
+
+        urlInput.addEventListener('input', validateUrl)
+      })
+    </script>
+  </body>
 </html>
