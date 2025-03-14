@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'http://videosnap.docker',
+	site: 'https://videosnap.org',
 	integrations: [mdx(), sitemap()],
 	devToolbar: {
 		enabled: false
