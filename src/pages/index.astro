@@ -11,7 +11,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
     <style>
       .title {
-        color: #000000; /* Đen */
+        color: #000000;
         font-size: 3rem;
         font-weight: 600;
         margin: 0 0 10px 0;
@@ -19,7 +19,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
       }
 
       .subtitle {
-        color: #666666; /* Xám nhạt */
+        color: #666666;
         font-size: 1.2rem;
         font-weight: 500;
         margin: 0 0 20px 0;
@@ -55,11 +55,11 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
 
       #url-input:focus {
         border-color: #000000;
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.4); /* Shadow khi focus */
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
       }
 
       #url-input:hover {
-        box-shadow: 0 0 6px rgba(0, 0, 0, 0.3); /* Shadow khi hover */
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
       }
 
       .clear-icon {
@@ -97,7 +97,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
 
       .image-container {
         display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 3 cột bằng nhau */
+        grid-template-columns: repeat(3, 1fr);
         gap: 10px;
         margin-top: 20px;
         max-width: fit-content;
@@ -108,6 +108,28 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
         height: auto;
         border: 1px solid #000000;
         border-radius: 4px;
+      }
+
+      .image-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .timestamp {
+        color: #666666;
+        font-size: 0.9rem;
+        text-align: center;
+        display: none; /* Ẩn mặc định, hiện khi ảnh có dữ liệu */
+      }
+
+      .note {
+        color: #999999;
+        font-size: 0.9rem;
+        font-style: italic;
+        text-align: center;
+        margin: 0;
       }
 
       @media (max-width: 599px) {
@@ -127,6 +149,14 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
         #snap-button {
           padding: 10px 20px;
           font-size: 0.9rem;
+        }
+
+        .note {
+          font-size: 0.75rem;
+        }
+
+        .timestamp {
+          font-size: 0.75rem;
         }
       }
     </style>
@@ -158,32 +188,51 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
             ></path>
           </svg>
         </div>
+        <p class='note'>
+          We will capture 3 random images from your video, it may take over 10
+          seconds
+        </p>
         <button id='snap-button' disabled>Snap Now</button>
       </div>
 
       <div class='image-container'>
-        <img
-          id='snap1'
-          src=''
-          alt='First snapshot from YouTube video'
-          style='display: none;'
-        />
-        <img
-          id='snap2'
-          src=''
-          alt='Second snapshot from YouTube video'
-          style='display: none;'
-        />
-        <img
-          id='snap3'
-          src=''
-          alt='Third snapshot from YouTube video'
-          style='display: none;'
-        />
+        <div class='image-item'>
+          <img
+            id='snap1'
+            src=''
+            alt='First snapshot from YouTube video'
+            style='display: none;'
+          />
+          <span id='time1' class='timestamp'></span>
+        </div>
+        <div class='image-item'>
+          <img
+            id='snap2'
+            src=''
+            alt='Second snapshot from YouTube video'
+            style='display: none;'
+          />
+          <span id='time2' class='timestamp'></span>
+        </div>
+        <div class='image-item'>
+          <img
+            id='snap3'
+            src=''
+            alt='Third snapshot from YouTube video'
+            style='display: none;'
+          />
+          <span id='time3' class='timestamp'></span>
+        </div>
       </div>
     </main>
     <Footer />
     <script>
+      interface ImageUrl {
+        url: string
+        name: string
+        timestamp: number
+      }
+
       const apiUrl = import.meta.env.PUBLIC_API_URL
 
       document.addEventListener('DOMContentLoaded', () => {
@@ -207,6 +256,16 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
           '#snap3'
         ) as HTMLImageElement
 
+        const time1: HTMLImageElement = document.querySelector(
+          '#time1'
+        ) as HTMLImageElement
+        const time2: HTMLImageElement = document.querySelector(
+          '#time2'
+        ) as HTMLImageElement
+        const time3: HTMLImageElement = document.querySelector(
+          '#time3'
+        ) as HTMLImageElement
+
         function validateUrl(): void {
           const url: string = urlInput.value.trim()
           const youtubeRegex: RegExp =
@@ -215,26 +274,45 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
 
           snapButton.disabled = !isValidUrl
 
-          // Hiện/ẩn icon clear dựa trên value
           clearIcon.style.display = url.length > 0 ? 'block' : 'none'
         }
 
-        // Xóa value khi click icon
+        function formatTimestamp(seconds: number): string {
+          const minutes = Math.floor(seconds / 60)
+          const remainingSeconds = seconds % 60
+          return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`
+        }
+
         clearIcon.addEventListener('click', () => {
           urlInput.value = ''
-          validateUrl() // Gọi lại để cập nhật trạng thái nút và ẩn icon
+          validateUrl()
         })
 
         snapButton.addEventListener('click', async () => {
           if (!snapButton.disabled || !apiUrl) {
+            let videoId = null
+            const url = new URL(urlInput.value)
+
+            if (url.hostname.includes('youtube.com')) {
+              videoId = url.searchParams.get('v')
+            } else if (url.hostname.includes('youtu.be')) {
+              videoId = url.pathname.slice(1)
+            }
+
+            if (!videoId) {
+              alert('Invalid YouTube URL. Please enter a valid URL.')
+              return
+            }
+
             try {
-              // Gọi API phía server
-              const response = await fetch(`${apiUrl}/api/screenshots`, {
+              snapButton.textContent = 'Snapping...'
+              snapButton.disabled = true
+
+              const response = await fetch(`${apiUrl}/screenshots/${videoId}`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ url: urlInput.value }),
               })
 
               if (!response.ok) {
@@ -243,18 +321,27 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
                 )
               }
 
-              const data: { images: string[] } = await response.json()
+              const data: ImageUrl[] = await response.json()
 
-              // Hiển thị ảnh từ response
-              snap1.src = data.images[0]
-              snap2.src = data.images[1]
-              snap3.src = data.images[2]
+              snap1.src = data[0].url
+              snap2.src = data[1].url
+              snap3.src = data[2].url
               snap1.style.display = 'block'
               snap2.style.display = 'block'
               snap3.style.display = 'block'
+
+              time1.textContent = formatTimestamp(data[0].timestamp)
+              time2.textContent = formatTimestamp(data[1].timestamp)
+              time3.textContent = formatTimestamp(data[2].timestamp)
+              time1.style.display = 'block'
+              time2.style.display = 'block'
+              time3.style.display = 'block'
             } catch (error) {
               console.error('Error fetching snapshots:', error)
               alert('Failed to fetch snapshots. Please try again.')
+            } finally {
+              snapButton.textContent = 'Snap Now'
+              validateUrl()
             }
           }
         })
